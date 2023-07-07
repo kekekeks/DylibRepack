@@ -38,13 +38,13 @@ class LibraryRepackager
             chmod(targetPath, 0x000001FF);
             foreach (var dep in item.Value)
             {
-                var depName = Path.GetFileName(dep);
+                var depName = Path.GetFileName(dep.ResolvedPath);
                 var newDep = "@loader_path/" + depName;
-                Console.WriteLine($"Changing {dep} to {newDep}");
+                Console.WriteLine($"Changing {dep.VerbatimName} to {newDep}");
                 ToolRunner.RunTool("install_name_tool", new[]
                 {
                     "-change",
-                    dep,
+                    dep.VerbatimName,
                     newDep,
                     targetPath
                 });
@@ -71,9 +71,9 @@ class LibraryRepackager
         return BitConverter.ToString(hash);
     }
 
-    static Dictionary<string, List<string>> BuildDependencyGraph(string[] libs)
+    static Dictionary<string, List<DylibDependency>> BuildDependencyGraph(string[] libs)
     {
-        var dic = new Dictionary<string, List<string>>();
+        var dic = new Dictionary<string, List<DylibDependency>>();
         var dependencyQueue = new Queue<string>();
         var visitedLibs = new HashSet<string>();
         foreach (var lib in libs)
@@ -84,8 +84,8 @@ class LibraryRepackager
             var deps = OToolDependencyParser.GetNonSystemDeps(currentLib);
             dic[currentLib] = deps.ToList();
             foreach(var dep in deps)
-                if(visitedLibs.Add(dep))
-                    dependencyQueue.Enqueue(dep);
+                if(visitedLibs.Add(dep.ResolvedPath))
+                    dependencyQueue.Enqueue(dep.ResolvedPath);
         }
         return dic;
     }
