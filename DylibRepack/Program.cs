@@ -24,6 +24,7 @@ static class Program
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     class VerifyArgs
     {
+        [Value(0)]
         public string Path { get; set; }
     }
     
