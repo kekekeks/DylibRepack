@@ -3,7 +3,7 @@ namespace DylibRepack;
 record DylibDependency(string VerbatimName, string ResolvedPath);
 class OToolDependencyParser
 {
-    private static string[] Prefixes = new[] { "@rpath/", @"loader_path/" };
+    private static string[] Prefixes = new[] { "@rpath/", "@loader_path/" };
     public static IEnumerable<DylibDependency> GetDependencies(string library)
     {
         var result = ToolRunner.RunToolAndCheckSuccess("otool", new[]{"-L", library});
